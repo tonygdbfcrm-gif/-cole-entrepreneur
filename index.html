@@ -1,0 +1,521 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>École des Entrepreneurs</title>
+<meta name="theme-color" content="#14215A">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Entrepreneurs">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --fond:#EEF2FB; --surface:#FFFFFF; --encre:#14215A; --texte:#1E2440; --doux:#5A6386;
+  --or:#F2B705; --or-fonce:#8A6400; --vert:#1E7F52; --vert-fond:#E3F5EC; --rouge:#B3362A; --rouge-fond:#FBE9E6;
+  --trait:#D5DCEE; --bulle:#E4E9F8; color-scheme:light;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --fond:#0E1430; --surface:#18204A; --encre:#E7ECFF; --texte:#E3E7F7; --doux:#A3ABCC;
+    --or:#F5C431; --or-fonce:#F5C431; --vert:#5CCB94; --vert-fond:#163A2E; --rouge:#FF8A7A; --rouge-fond:#3E1E25;
+    --trait:#2A3466; --bulle:#222C5C; color-scheme:dark;
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--fond);color:var(--texte);font:17px/1.55 "Atkinson Hyperlegible",system-ui,sans-serif;
+  padding-bottom:env(safe-area-inset-bottom);-webkit-text-size-adjust:100%}
+h1,h2,h3{font-family:"Bricolage Grotesque",system-ui,sans-serif;color:var(--encre);line-height:1.15;margin:0 0 .5em}
+h1{font-size:2rem;font-weight:800;letter-spacing:-.01em}
+h2{font-size:1.45rem;font-weight:800}
+h3{font-size:1.1rem;font-weight:600}
+p{margin:0 0 1em;max-width:62ch}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--or);outline-offset:2px}
+
+.barre{position:sticky;top:0;z-index:5;display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:calc(10px + env(safe-area-inset-top)) 18px 10px;background:var(--fond);border-bottom:1px solid var(--trait)}
+.marque{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.05rem;color:var(--encre);background:none;border:0;padding:4px 0;cursor:pointer}
+.tirelire{display:flex;align-items:center;gap:8px;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.3rem;color:var(--encre)}
+.pile{position:relative;width:30px;height:30px}
+.pile i{position:absolute;left:0;width:30px;height:12px;border-radius:50%;background:var(--or);box-shadow:inset 0 -3px 0 var(--or-fonce)}
+.pile i:nth-child(1){bottom:0}.pile i:nth-child(2){bottom:7px}.pile i:nth-child(3){bottom:14px}
+.tirelire.gagne .pile{animation:saut .6s ease}
+@keyframes saut{30%{transform:translateY(-8px) scale(1.15)}60%{transform:translateY(1px)}}
+@media (prefers-reduced-motion: reduce){.tirelire.gagne .pile{animation:none}}
+
+main{max-width:680px;margin:0 auto;padding:22px 18px 60px}
+.bloc{background:var(--surface);border:1px solid var(--trait);border-radius:18px;padding:20px;margin-bottom:16px}
+.doux{color:var(--doux)}
+.petit{font-size:.92rem}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 20px;border-radius:999px;
+  border:2px solid var(--encre);background:var(--encre);color:var(--surface);font-weight:700;cursor:pointer;text-decoration:none}
+.btn.clair{background:transparent;color:var(--encre)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.plein{width:100%}
+.rangee{display:flex;gap:10px;flex-wrap:wrap}
+
+label{display:block;font-weight:700;margin:14px 0 6px}
+input[type=text],input[type=number],textarea{width:100%;padding:12px 14px;border-radius:12px;border:2px solid var(--trait);background:var(--surface)}
+input:focus,textarea:focus{border-color:var(--encre);outline:none}
+.choix{display:grid;gap:10px}
+.choix button{text-align:left;padding:14px 16px;border-radius:14px;border:2px solid var(--trait);background:var(--surface);cursor:pointer;min-height:52px}
+.choix button[aria-pressed=true]{border-color:var(--encre);background:var(--bulle);font-weight:700}
+
+/* Chemin du module */
+.chemin{list-style:none;margin:0;padding:0;position:relative}
+.chemin::before{content:"";position:absolute;left:23px;top:24px;bottom:24px;width:4px;border-radius:2px;background:var(--trait)}
+.chemin li{position:relative;display:flex;gap:14px;align-items:center;margin-bottom:12px}
+.jeton{flex:0 0 50px;height:50px;border-radius:50%;display:grid;place-items:center;font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:1.2rem;
+  background:var(--surface);border:3px solid var(--trait);color:var(--doux);z-index:1}
+.chemin li.fait .jeton{background:var(--or);border-color:var(--or-fonce);color:#3A2A00}
+.chemin li.ouvert .jeton{border-color:var(--encre);color:var(--encre)}
+.chemin button.carte{flex:1;text-align:left;background:var(--surface);border:1px solid var(--trait);border-radius:16px;padding:14px 16px;cursor:pointer}
+.chemin button.carte:disabled{cursor:not-allowed;opacity:.55}
+.chemin .titre{display:block;font-weight:700;color:var(--encre)}
+
+/* Onglets */
+.onglets{display:flex;gap:6px;background:var(--bulle);padding:5px;border-radius:999px;margin:0 0 16px}
+.onglets button{flex:1;min-height:42px;border:0;border-radius:999px;background:transparent;font-weight:700;color:var(--doux);cursor:pointer}
+.onglets button[aria-selected=true]{background:var(--surface);color:var(--encre)}
+
+/* Quiz */
+.question{margin-bottom:22px}
+.question h3{margin-bottom:10px}
+.choix button.juste{border-color:var(--vert);background:var(--vert-fond)}
+.choix button.faux{border-color:var(--rouge);background:var(--rouge-fond)}
+.retour{margin-top:10px;padding:10px 14px;border-radius:12px;font-size:.95rem}
+.retour.ok{background:var(--vert-fond);color:var(--vert)}
+.retour.ko{background:var(--rouge-fond);color:var(--rouge)}
+
+/* Discussion */
+.fil{display:flex;flex-direction:column;gap:10px;margin-bottom:12px}
+.msg{max-width:88%;padding:12px 15px;border-radius:18px;white-space:normal;word-wrap:break-word}
+.msg.prof{align-self:flex-start;background:var(--bulle);border-bottom-left-radius:6px}
+.msg.eleve{align-self:flex-end;background:var(--encre);color:var(--surface);border-bottom-right-radius:6px}
+.msg.info{align-self:center;background:transparent;color:var(--doux);font-size:.92rem;text-align:center}
+.ecouter{display:block;margin-top:6px;border:0;background:none;color:var(--doux);font-size:.85rem;padding:2px 0;cursor:pointer;text-decoration:underline}
+.puces{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.puces button{border:1px solid var(--trait);background:var(--surface);border-radius:999px;padding:8px 14px;cursor:pointer;font-size:.92rem}
+.saisie{display:flex;gap:8px;align-items:flex-end}
+.saisie textarea{min-height:52px;max-height:140px;resize:none}
+.saisie .btn{flex:0 0 auto}
+
+/* Espace parent */
+table{width:100%;border-collapse:collapse;font-size:.95rem}
+th,td{text-align:left;padding:10px 6px;border-bottom:1px solid var(--trait);vertical-align:top}
+th{color:var(--doux);font-weight:700}
+.grand{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:2.4rem;color:var(--encre);line-height:1}
+</style>
+</head>
+<body>
+<header class="barre">
+  <button class="marque" id="lienAccueil" type="button">École des Entrepreneurs</button>
+  <div class="tirelire" id="tirelire" aria-live="polite" title="Tes pièces gagnées">
+    <span class="pile" aria-hidden="true"><i></i><i></i><i></i></span>
+    <span id="nbPieces">0</span><span class="sr" style="position:absolute;left:-9999px">pièces</span>
+  </div>
+</header>
+<main id="app"></main>
+
+<script>
+/* =========================================================
+   CONTENU PÉDAGOGIQUE — 6e, module 1 : « C'est quoi l'argent ? »
+   (La bonne réponse de chaque quiz est toujours la première de la liste :
+   l'application mélange l'ordre à l'affichage.)
+   ========================================================= */
+const MODULE = { classe: "6e", numero: 1, titre: "C'est quoi l'argent ?" };
+const ETAPES = [
+  {
+    id: "troc", titre: "Avant l'argent : le troc", resume: "Comment on échangeait autrefois",
+    lecon: [
+      "Il y a très longtemps, l'argent n'existait pas. Pour obtenir quelque chose, on échangeait : trois poissons contre un panier de manioc, une chèvre contre des outils. C'est le **troc**.",
+      "Le troc a un gros problème. Imagine : tu as des poissons et tu veux des chaussures. Mais le cordonnier ne veut pas de poissons, il veut du riz. Il faut trouver quelqu'un qui veut exactement ce que tu as, au bon moment. C'est très compliqué !",
+      "Autre souci : comment couper une chèvre en deux pour acheter un petit objet ? Certaines choses ne se partagent pas."
+    ],
+    quiz: [
+      { q: "C'est quoi, le troc ?", r: ["Échanger un objet contre un autre objet", "Payer avec des billets", "Emprunter de l'argent à la banque"],
+        ex: "Le troc, c'est échanger directement une chose contre une autre, sans argent." },
+      { q: "Pourquoi le troc est-il compliqué ?", r: ["Il faut trouver quelqu'un qui veut exactement ce que tu as", "Les objets sont trop légers", "C'est interdit par la loi"],
+        ex: "Pour échanger, les deux personnes doivent vouloir ce que l'autre propose, au même moment." }
+    ],
+    puces: ["Explique-moi encore le problème du troc", "Donne-moi un exemple de troc aujourd'hui", "Pose-moi une question pour vérifier"]
+  },
+  {
+    id: "monnaie", titre: "La naissance de la monnaie", resume: "Coquillages, cuivre, pièces et billets",
+    lecon: [
+      "Pour régler le problème du troc, les humains ont choisi des objets que tout le monde accepte en échange : c'est la **monnaie**.",
+      "Selon les régions, on a utilisé des coquillages appelés **cauris**, du sel, du métal… Au Katanga, on utilisait des **croisettes** : de petites croix en cuivre. Ailleurs, des pièces en or et en argent.",
+      "Puis sont arrivés les **billets** en papier, beaucoup plus légers à transporter. Une bonne monnaie doit être acceptée par tous, facile à transporter, et se diviser en petites quantités."
+    ],
+    quiz: [
+      { q: "Au Katanga, quelle monnaie utilisait-on autrefois ?", r: ["Des croisettes en cuivre", "Des feuilles de bananier", "Des cailloux ronds"],
+        ex: "Les croisettes étaient de petites croix en cuivre, un métal très présent au Katanga." },
+      { q: "Qu'est-ce qu'une bonne monnaie ?", r: ["Elle est acceptée par tous et facile à transporter", "Elle est très lourde et difficile à trouver", "On ne peut l'utiliser qu'une seule fois"],
+        ex: "Une bonne monnaie est acceptée par tout le monde, se transporte facilement et se divise en petites quantités." }
+    ],
+    puces: ["Pourquoi les billets ont remplacé les pièces lourdes ?", "Raconte-moi l'histoire des cauris", "Pose-moi une question pour vérifier"]
+  },
+  {
+    id: "aujourdhui", titre: "Les monnaies d'aujourd'hui", resume: "Euro, franc congolais, dollar, mobile money",
+    lecon: [
+      "Chaque pays (ou groupe de pays) a sa monnaie. En France, c'est l'**euro** (€). En RDC, c'est le **franc congolais** (FC), et on utilise aussi beaucoup le **dollar américain** ($).",
+      "Aujourd'hui, on ne paie pas toujours avec des billets. On paie avec une carte bancaire, ou avec son téléphone grâce au **mobile money** (comme M-Pesa, Orange Money ou Airtel Money). C'est de l'argent **numérique** : on ne le touche pas, mais il existe bien sur un compte.",
+      "Comme les monnaies sont différentes, on doit parfois les échanger : c'est le **change**. Le prix d'une monnaie dans une autre monnaie s'appelle le **taux de change**, et il bouge souvent."
+    ],
+    quiz: [
+      { q: "Quelle est la monnaie officielle de la RDC ?", r: ["Le franc congolais", "L'euro", "Le dollar canadien"],
+        ex: "La monnaie officielle de la RDC est le franc congolais, même si le dollar américain est très utilisé." },
+      { q: "Le mobile money, c'est…", r: ["Payer et envoyer de l'argent avec son téléphone", "Une pièce de monnaie spéciale", "Un magasin qui vend des téléphones"],
+        ex: "Avec le mobile money, l'argent est sur un compte lié au téléphone." },
+      { q: "Le taux de change, c'est…", r: ["Le prix d'une monnaie dans une autre monnaie", "Le prix d'un téléphone", "L'heure d'ouverture de la banque"],
+        ex: "Par exemple : combien de francs congolais il faut pour avoir 1 dollar." }
+    ],
+    puces: ["Comment marche le mobile money ?", "Pourquoi le taux de change bouge ?", "Pose-moi une question pour vérifier"]
+  },
+  {
+    id: "valeur", titre: "Pourquoi l'argent a de la valeur", resume: "Confiance, inflation et rareté",
+    lecon: [
+      "Un billet, c'est du papier. Pourtant, avec, on peut acheter du pain. Pourquoi ? Parce que tout le monde a **confiance** : le vendeur sait qu'il pourra lui aussi utiliser ce billet.",
+      "C'est la **banque centrale** du pays qui fabrique les billets. Si elle en fabrique beaucoup trop, chaque billet vaut moins, et les prix montent : c'est l'**inflation**.",
+      "La valeur d'une chose dépend aussi de sa **rareté** et de l'envie des gens : si tout le monde veut un objet et qu'il y en a peu, son prix monte."
+    ],
+    quiz: [
+      { q: "Pourquoi un billet a-t-il de la valeur ?", r: ["Parce que tout le monde a confiance et l'accepte", "Parce que le papier coûte très cher", "Parce qu'il a de jolies couleurs"],
+        ex: "La valeur d'un billet vient de la confiance : tout le monde l'accepte en paiement." },
+      { q: "Quand les prix montent un peu partout, on appelle ça…", r: ["L'inflation", "Le troc", "L'épargne"],
+        ex: "L'inflation, c'est la hausse générale des prix : avec le même argent, on achète moins de choses." },
+      { q: "Un objet rare que tout le monde veut…", r: ["Coûte plus cher", "Coûte moins cher", "Devient gratuit"],
+        ex: "Quand il y a peu d'objets et beaucoup d'acheteurs, le prix monte." }
+    ],
+    puces: ["Explique-moi l'inflation avec un exemple", "Qui décide de fabriquer les billets ?", "Pose-moi une question pour vérifier"]
+  },
+  {
+    id: "mission", titre: "Mission : ton premier stand", resume: "Vends ton produit à un vrai client", mission: true,
+    lecon: [
+      "C'est le moment de devenir entrepreneur ! Tu ouvres un petit stand. Choisis ce que tu vends et fixe ton prix.",
+      "Un client va venir te parler. Il pose des questions et il essaie de négocier. À toi de le convaincre d'acheter, sans vendre à perte !"
+    ],
+    produits: ["Des beignets", "Du jus de fruits", "Des bracelets", "Laver des vélos"]
+  }
+];
+
+/* =========================================================
+   MÉMOIRE DE L'APP (enregistrée sur l'appareil uniquement)
+   ========================================================= */
+const CLE = "ecole-entrepreneurs-v1";
+let S = charger();
+function charger(){ try { return JSON.parse(localStorage.getItem(CLE)) || null; } catch(e){ return null; } }
+function sauver(){ try { localStorage.setItem(CLE, JSON.stringify(S)); } catch(e){} }
+function etat(id){ if(!S.etapes[id]) S.etapes[id] = { fini:false, reponses:{}, chat:[] }; return S.etapes[id]; }
+function monnaie(){ return S.pays === "RDC" ? "FC" : "€"; }
+
+const app = document.getElementById("app");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;" }[c]));
+const riche = s => esc(s).replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>").replace(/\*/g, "").replace(/\n/g, "<br>");
+
+function afficherPieces(gain){
+  document.getElementById("nbPieces").textContent = S ? S.pieces : 0;
+  if(gain){ const t = document.getElementById("tirelire"); t.classList.remove("gagne"); void t.offsetWidth; t.classList.add("gagne"); }
+}
+function gagner(n){ S.pieces += n; sauver(); afficherPieces(true); }
+function ouverte(i){ return i === 0 || (S.etapes[ETAPES[i-1].id] && S.etapes[ETAPES[i-1].id].fini); }
+
+/* =========================================================
+   ÉCRAN 1 — Bienvenue
+   ========================================================= */
+function ecranBienvenue(){
+  let pays = "RDC";
+  app.innerHTML = `
+    <h1>Deviens entrepreneur, une pièce après l'autre.</h1>
+    <p class="doux">Ici, tu apprends comment marche l'argent, puis tu crées ta propre entreprise. Ton professeur, c'est une intelligence artificielle qui s'adapte à toi.</p>
+    <div class="bloc">
+      <label for="prenom">Ton prénom</label>
+      <input id="prenom" type="text" autocomplete="off" maxlength="20" placeholder="Par exemple : Léa">
+      <p class="petit doux" style="margin-top:6px">Ton prénom reste sur cet appareil. Le prof IA ne le reçoit pas.</p>
+      <label id="lblPays">Tu habites où ?</label>
+      <div class="choix" role="group" aria-labelledby="lblPays">
+        <button type="button" data-pays="RDC" aria-pressed="true">En RD Congo</button>
+        <button type="button" data-pays="France" aria-pressed="false">En France</button>
+      </div>
+      <label>Ta classe</label>
+      <p style="margin:0">Sixième <span class="doux petit">(la 5e, la 4e et la 3e arrivent bientôt)</span></p>
+      <div style="margin-top:20px"><button class="btn plein" id="commencer" type="button">Commencer</button></div>
+    </div>`;
+  app.querySelectorAll("[data-pays]").forEach(b => b.onclick = () => {
+    pays = b.dataset.pays;
+    app.querySelectorAll("[data-pays]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  });
+  document.getElementById("commencer").onclick = () => {
+    const prenom = document.getElementById("prenom").value.trim();
+    if(!prenom){ document.getElementById("prenom").focus(); return; }
+    S = { prenom, pays, classe:"6e", pieces:0, etapes:{}, mission:{ produit:null, prix:"" }, debut: Date.now() };
+    sauver(); afficherPieces(); ecranModule();
+  };
+}
+
+/* =========================================================
+   ÉCRAN 2 — Le chemin du module
+   ========================================================= */
+function ecranModule(){
+  const faits = ETAPES.filter(e => S.etapes[e.id] && S.etapes[e.id].fini).length;
+  app.innerHTML = `
+    <p class="doux" style="margin-bottom:4px">Bonjour ${esc(S.prenom)} !</p>
+    <h1>Module ${MODULE.numero} : ${esc(MODULE.titre)}</h1>
+    <p class="doux">${faits} étape${faits>1?"s":""} sur ${ETAPES.length} terminée${faits>1?"s":""}. Chaque étape réussie remplit ta tirelire.</p>
+    <ol class="chemin">
+      ${ETAPES.map((e,i) => {
+        const fait = S.etapes[e.id] && S.etapes[e.id].fini, ok = ouverte(i);
+        return `<li class="${fait?"fait":ok?"ouvert":""}">
+          <span class="jeton" aria-hidden="true">${i+1}</span>
+          <button class="carte" type="button" data-i="${i}" ${ok?"":"disabled"}>
+            <span class="titre">${esc(e.titre)}</span>
+            <span class="petit doux">${fait?"Terminé — ":ok?"":"Termine l'étape d'avant pour ouvrir celle-ci — "}${esc(e.resume)}</span>
+          </button></li>`;
+      }).join("")}
+    </ol>
+    ${faits === ETAPES.length ? `<div class="bloc"><h2>Bravo, module terminé !</h2><p style="margin:0">Le module 2, « Gagner de l'argent », arrive dans la prochaine version.</p></div>` : ""}
+    <div class="rangee" style="margin-top:22px"><button class="btn clair" id="parent" type="button">Espace parent</button></div>`;
+  app.querySelectorAll("button.carte").forEach(b => b.onclick = () => ecranEtape(+b.dataset.i, "lecon"));
+  document.getElementById("parent").onclick = ecranParent;
+  window.scrollTo(0,0);
+}
+
+/* =========================================================
+   ÉCRAN 3 — Une étape : leçon, quiz, prof
+   ========================================================= */
+let ordres = {};
+function melange(n){ const a = [...Array(n).keys()]; for(let i=n-1;i>0;i--){ const j = Math.floor(Math.random()*(i+1)); [a[i],a[j]] = [a[j],a[i]]; } return a; }
+
+function ecranEtape(i, onglet){
+  const e = ETAPES[i], st = etat(e.id);
+  const tabs = e.mission ? [["lecon","Ton stand"],["prof","Le client"]] : [["lecon","Leçon"],["quiz","Quiz"],["prof","Le prof"]];
+  app.innerHTML = `
+    <button class="btn clair" id="retour" type="button" style="min-height:40px;padding:6px 16px;margin-bottom:16px">Retour au module</button>
+    <p class="doux petit" style="margin-bottom:2px">Étape ${i+1} sur ${ETAPES.length}</p>
+    <h2>${esc(e.titre)}</h2>
+    <div class="onglets" role="tablist">${tabs.map(([k,l]) => `<button role="tab" type="button" data-t="${k}" aria-selected="${k===onglet}">${l}</button>`).join("")}</div>
+    <div id="contenu"></div>`;
+  document.getElementById("retour").onclick = ecranModule;
+  app.querySelectorAll("[data-t]").forEach(b => b.onclick = () => ecranEtape(i, b.dataset.t));
+  const c = document.getElementById("contenu");
+  if(onglet === "lecon") e.mission ? vueStand(c, i) : vueLecon(c, i);
+  if(onglet === "quiz") vueQuiz(c, i);
+  if(onglet === "prof") vueProf(c, i);
+  window.scrollTo(0,0);
+}
+
+function vueLecon(c, i){
+  const e = ETAPES[i];
+  c.innerHTML = `<div class="bloc">${e.lecon.map(p => `<p>${riche(p)}</p>`).join("")}
+    <button class="ecouter" type="button" id="lire">Écouter la leçon</button></div>
+    <div class="rangee"><button class="btn" id="versQuiz" type="button">Je fais le quiz</button>
+    <button class="btn clair" id="versProf" type="button">J'ai une question</button></div>`;
+  document.getElementById("lire").onclick = () => parler(e.lecon.join(" "));
+  document.getElementById("versQuiz").onclick = () => ecranEtape(i, "quiz");
+  document.getElementById("versProf").onclick = () => ecranEtape(i, "prof");
+}
+
+function vueQuiz(c, i){
+  const e = ETAPES[i], st = etat(e.id);
+  c.innerHTML = e.quiz.map((q, k) => {
+    if(!ordres[e.id+k]) ordres[e.id+k] = melange(q.r.length);
+    const rep = st.reponses[k];
+    return `<div class="bloc question" data-k="${k}"><h3>${k+1}. ${esc(q.q)}</h3>
+      <div class="choix">${ordres[e.id+k].map(o => {
+        const cls = rep && rep.ok && o === 0 ? "juste" : "";
+        return `<button type="button" data-o="${o}" class="${cls}" ${rep && rep.ok ? "disabled" : ""}>${esc(q.r[o])}</button>`;
+      }).join("")}</div>
+      ${rep && rep.ok ? `<div class="retour ok">Bien joué ! ${esc(q.ex)}</div>` : `<div class="zone"></div>`}</div>`;
+  }).join("") + `<div id="fin"></div>`;
+  c.querySelectorAll(".question").forEach(bloc => {
+    const k = +bloc.dataset.k, q = e.quiz[k];
+    bloc.querySelectorAll("[data-o]").forEach(b => b.onclick = () => {
+      const o = +b.dataset.o, rep = st.reponses[k] || (st.reponses[k] = { erreurs:0, ok:false });
+      if(rep.ok) return;
+      if(o === 0){
+        rep.ok = true; if(rep.erreurs === 0) gagner(5); sauver(); vueQuiz(c, i);
+      } else {
+        rep.erreurs++; sauver(); b.classList.add("faux"); b.disabled = true;
+        bloc.querySelector(".zone").innerHTML = `<div class="retour ko">Pas tout à fait. Relis la leçon dans ta tête et essaie encore.${rep.erreurs >= 2 ? " Indice : " + esc(q.ex) : ""}</div>`;
+      }
+    });
+  });
+  if(e.quiz.every((q,k) => st.reponses[k] && st.reponses[k].ok)){
+    if(!st.fini){ st.fini = true; sauver(); gagner(10); }
+    const sansFaute = e.quiz.every((q,k) => st.reponses[k].erreurs === 0);
+    document.getElementById("fin").innerHTML = `<div class="bloc"><h3>Étape réussie, +10 pièces !</h3>
+      <p>${sansFaute ? "Zéro erreur, tu es à l'aise. Demande au prof un défi plus difficile !" : "Tu as eu quelques hésitations : le prof peut t'aider à bien comprendre ces points."}</p>
+      <div class="rangee"><button class="btn" type="button" id="suivant">Étape suivante</button>
+      <button class="btn clair" type="button" id="prof2">Parler au prof</button></div></div>`;
+    document.getElementById("suivant").onclick = () => ecranEtape(i+1, "lecon");
+    document.getElementById("prof2").onclick = () => ecranEtape(i, "prof");
+  }
+}
+
+function vueStand(c, i){
+  const e = ETAPES[i], m = S.mission;
+  c.innerHTML = `<div class="bloc">${e.lecon.map(p => `<p>${riche(p)}</p>`).join("")}
+      <label id="lblProd">Qu'est-ce que tu vends ?</label>
+      <div class="choix" role="group" aria-labelledby="lblProd">${e.produits.map(p => `<button type="button" data-p="${esc(p)}" aria-pressed="${m.produit===p}">${esc(p)}</button>`).join("")}</div>
+      <label for="prix">Ton prix, en ${S.pays === "RDC" ? "francs congolais (FC)" : "euros (€)"}</label>
+      <input id="prix" type="number" inputmode="decimal" min="0" step="any" value="${esc(m.prix)}" placeholder="${S.pays === "RDC" ? "Par exemple : 500" : "Par exemple : 1,50"}">
+      <p class="petit doux" style="margin-top:6px">Réfléchis : combien ça te coûte à fabriquer ? Combien les gens sont prêts à payer ?</p>
+      <div style="margin-top:18px"><button class="btn plein" id="ouvrir" type="button">Ouvrir mon stand</button></div></div>`;
+  c.querySelectorAll("[data-p]").forEach(b => b.onclick = () => {
+    m.produit = b.dataset.p; sauver();
+    c.querySelectorAll("[data-p]").forEach(x => x.setAttribute("aria-pressed", x === b));
+  });
+  document.getElementById("ouvrir").onclick = () => {
+    m.prix = document.getElementById("prix").value.trim();
+    if(!m.produit || !m.prix){ alert("Choisis un produit et écris ton prix."); return; }
+    sauver(); ecranEtape(i, "prof");
+  };
+}
+
+/* ---------- Le professeur IA ---------- */
+function contexte(e){
+  const st = etat(e.id);
+  const pays = S.pays === "RDC"
+    ? "en République démocratique du Congo. Monnaies : franc congolais et dollar. Prends des exemples de la vie quotidienne congolaise (marché, mobile money, petits commerces)."
+    : "en France. Monnaie : euro. Prends des exemples de la vie quotidienne en France.";
+  if(e.mission){
+    const client = S.pays === "RDC" ? "Maman Rose" : "Madame Martin";
+    return `MISSION JEU DE RÔLE. L'élève (classe de 6e) vit ${pays}
+Tu joues ${client}, une cliente qui arrive au stand de l'élève. L'élève vend : ${S.mission.produit}, au prix de ${S.mission.prix} ${monnaie()}.
+Reste dans ton rôle : pose des questions sur le produit, trouve le prix un peu cher et essaie de négocier gentiment. Une seule question ou remarque à la fois, 1 à 3 phrases. Si l'élève argumente bien, achète. S'il baisse trop son prix, fais-le remarquer plus tard dans le bilan.
+Quand l'élève a envoyé environ 5 messages, termine la scène, puis écris « Bilan du prof : » et donne 2 points forts et 1 conseil pour mieux vendre.
+Tu as commencé la scène en disant : « Bonjour ! Qu'est-ce que tu vends ici ? »`;
+  }
+  const rep = st.reponses, n = e.quiz.length, vus = Object.keys(rep).length;
+  const erreurs = e.quiz.filter((q,k) => rep[k] && rep[k].erreurs > 0).map(q => q.q);
+  const premier = e.quiz.filter((q,k) => rep[k] && rep[k].ok && rep[k].erreurs === 0).length;
+  const niveau = !vus ? "pas encore évalué (l'élève n'a pas encore fait le quiz)"
+    : premier / n >= 0.8 ? "à l'aise : propose-lui des défis un peu plus difficiles et des liens avec l'entrepreneuriat"
+    : "a besoin d'aide : explique avec des exemples très concrets, une idée à la fois, et vérifie souvent";
+  return `Module en cours (classe de 6e) : « ${MODULE.titre} ». Étape : « ${e.titre} ».
+Contenu de la leçon : ${e.lecon.join(" ").replace(/\*\*/g,"")}
+L'élève vit ${pays}
+Niveau observé : ${niveau}.
+${erreurs.length ? "Questions du quiz où l'élève s'est trompé : " + erreurs.join(" | ") + ". Revois ces points en priorité quand l'occasion se présente." : ""}
+Tu as accueilli l'élève en disant : « Je suis ton prof. Pose-moi une question sur la leçon, ou dis-moi ce que tu n'as pas compris. »`;
+}
+
+function vueProf(c, i){
+  const e = ETAPES[i], st = etat(e.id);
+  if(e.mission && (!S.mission.produit || !S.mission.prix)){ vueStand(c, i); return; }
+  const accueil = e.mission ? (S.pays === "RDC" ? "Maman Rose" : "Madame Martin") + " : Bonjour ! Qu'est-ce que tu vends ici ?"
+                            : "Je suis ton prof. Pose-moi une question sur la leçon, ou dis-moi ce que tu n'as pas compris.";
+  const nbEleve = st.chat.filter(m => m.role === "eleve").length;
+  c.innerHTML = `
+    ${e.mission ? `<p class="doux petit">Tu vends ${esc(S.mission.produit.toLowerCase())} à ${esc(S.mission.prix)} ${monnaie()}. Réponds à la cliente et convaincs-la !</p>` : ""}
+    <div class="fil" id="fil" aria-live="polite"></div>
+    ${!e.mission ? `<div class="puces">${e.puces.map(p => `<button type="button" data-q="${esc(p)}">${esc(p)}</button>`).join("")}</div>` : ""}
+    <div class="saisie"><textarea id="champ" rows="1" maxlength="600" placeholder="Écris ton message…" aria-label="Ton message"></textarea>
+      <button class="btn" id="envoyer" type="button">Envoyer</button></div>
+    ${e.mission && !st.fini ? `<div style="margin-top:14px"><button class="btn clair plein" id="terminer" type="button" ${nbEleve >= 4 ? "" : "disabled"}>Terminer la mission (au moins 4 messages)</button></div>` : ""}
+    ${e.mission && st.fini ? `<div class="bloc" style="margin-top:14px"><h3>Mission réussie !</h3><p style="margin:0">Tu as vendu ton premier produit. Tu peux continuer à t'entraîner avec la cliente.</p></div>` : ""}
+    ${st.chat.length ? `<div style="margin-top:10px"><button class="ecouter" id="effacer" type="button">Recommencer la discussion</button></div>` : ""}`;
+  const fil = document.getElementById("fil");
+  const ajouter = (role, texte) => {
+    const d = document.createElement("div"); d.className = "msg " + role; d.innerHTML = riche(texte);
+    if(role === "prof"){ const b = document.createElement("button"); b.className = "ecouter"; b.type = "button"; b.textContent = "Écouter"; b.onclick = () => parler(texte); d.appendChild(b); }
+    fil.appendChild(d); return d;
+  };
+  ajouter("prof", accueil);
+  st.chat.forEach(m => ajouter(m.role, m.texte));
+  const champ = document.getElementById("champ"), envoyer = document.getElementById("envoyer");
+
+  async function poser(texte){
+    texte = texte.trim(); if(!texte) return;
+    if(!navigator.onLine){ ajouter("info", "Pas de connexion Internet. Le prof IA a besoin d'Internet ; les leçons et les quiz marchent sans."); return; }
+    st.chat.push({ role:"eleve", texte }); sauver(); ajouter("eleve", texte);
+    champ.value = ""; envoyer.disabled = true;
+    const attente = ajouter("info", e.mission ? "La cliente réfléchit…" : "Le prof écrit…");
+    attente.scrollIntoView({ block:"end", behavior:"smooth" });
+    try {
+      const r = await fetch("/.netlify/functions/tuteur", {
+        method:"POST", headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({ contexte: contexte(e), messages: st.chat.slice(-14) })
+      });
+      const d = await r.json().catch(() => ({}));
+      attente.remove();
+      if(!r.ok || !d.texte){ ajouter("info", d.erreur || "Le prof IA ne répond pas pour le moment. Réessaie dans un instant."); st.chat.pop(); sauver(); }
+      else { st.chat.push({ role:"prof", texte:d.texte }); sauver(); ajouter("prof", d.texte).scrollIntoView({ block:"start", behavior:"smooth" }); }
+    } catch(err){
+      attente.remove(); st.chat.pop(); sauver();
+      ajouter("info", "Impossible de joindre le prof. Vérifie ta connexion et réessaie.");
+    }
+    envoyer.disabled = false;
+    const t = document.getElementById("terminer");
+    if(t) t.disabled = st.chat.filter(m => m.role === "eleve").length < 4;
+  }
+  envoyer.onclick = () => poser(champ.value);
+  champ.onkeydown = ev => { if(ev.key === "Enter" && !ev.shiftKey){ ev.preventDefault(); poser(champ.value); } };
+  c.querySelectorAll("[data-q]").forEach(b => b.onclick = () => poser(b.dataset.q));
+  const t = document.getElementById("terminer");
+  if(t) t.onclick = () => { st.fini = true; sauver(); gagner(20); ecranEtape(i, "prof"); };
+  const ef = document.getElementById("effacer");
+  if(ef) ef.onclick = () => { if(confirm("Effacer cette discussion ?")){ st.chat = []; sauver(); ecranEtape(i, "prof"); } };
+}
+
+/* ---------- Lecture à voix haute ---------- */
+function parler(texte){
+  if(!("speechSynthesis" in window)){ alert("La lecture à voix haute n'est pas disponible sur cet appareil."); return; }
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(texte.replace(/\*/g, ""));
+  u.lang = "fr-FR"; u.rate = 0.95;
+  const voix = speechSynthesis.getVoices().find(v => v.lang && v.lang.startsWith("fr"));
+  if(voix) u.voice = voix;
+  speechSynthesis.speak(u);
+}
+
+/* =========================================================
+   ÉCRAN 4 — Espace parent
+   ========================================================= */
+function ecranParent(){
+  const jours = Math.max(1, Math.round((Date.now() - S.debut) / 86400000));
+  const lignes = ETAPES.map(e => {
+    const st = S.etapes[e.id] || { fini:false, reponses:{}, chat:[] };
+    const msgs = st.chat.filter(m => m.role === "eleve").length;
+    if(e.mission) return `<tr><td>${esc(e.titre)}</td><td>${st.fini ? "Terminée" : "À faire"}</td><td>${S.mission.produit ? esc(S.mission.produit) + " à " + esc(S.mission.prix) + " " + monnaie() : "—"}</td><td>${msgs}</td></tr>`;
+    const n = e.quiz.length, premier = e.quiz.filter((q,k) => st.reponses[k] && st.reponses[k].ok && st.reponses[k].erreurs === 0).length;
+    const err = e.quiz.filter((q,k) => st.reponses[k] && st.reponses[k].erreurs > 0).map(q => esc(q.q));
+    return `<tr><td>${esc(e.titre)}</td><td>${st.fini ? "Terminée" : "À faire"}</td><td>${Object.keys(st.reponses).length ? premier + "/" + n + " du premier coup" + (err.length ? "<br><span class='doux petit'>À revoir : " + err.join(" ; ") + "</span>" : "") : "—"}</td><td>${msgs}</td></tr>`;
+  }).join("");
+  app.innerHTML = `
+    <button class="btn clair" id="retour" type="button" style="min-height:40px;padding:6px 16px;margin-bottom:16px">Retour au module</button>
+    <h1>Espace parent</h1>
+    <p class="doux">Suivi de ${esc(S.prenom)} — classe de 6e, ${S.pays === "RDC" ? "RD Congo" : "France"}. Commencé il y a ${jours} jour${jours>1?"s":""}.</p>
+    <div class="bloc"><div class="grand">${S.pieces}</div><p class="doux" style="margin:4px 0 0">pièces gagnées (5 par bonne réponse du premier coup, 10 par étape, 20 pour la mission)</p></div>
+    <div class="bloc" style="overflow-x:auto"><table>
+      <thead><tr><th>Étape</th><th>État</th><th>Résultat</th><th>Messages au prof</th></tr></thead>
+      <tbody>${lignes}</tbody></table></div>
+    <div class="bloc"><h3>Bon à savoir</h3>
+      <p class="petit">Les progrès sont enregistrés uniquement sur cet appareil. Le prénom n'est jamais envoyé au professeur IA. Les leçons et les quiz fonctionnent sans Internet ; la discussion avec le prof en a besoin.</p>
+      <button class="btn clair" id="raz" type="button">Tout recommencer à zéro</button></div>`;
+  document.getElementById("retour").onclick = ecranModule;
+  document.getElementById("raz").onclick = () => {
+    if(confirm("Effacer toute la progression de " + S.prenom + " ? Cette action est définitive.")){
+      localStorage.removeItem(CLE); S = null; afficherPieces(); ecranBienvenue();
+    }
+  };
+  window.scrollTo(0,0);
+}
+
+/* =========================================================
+   DÉMARRAGE
+   ========================================================= */
+document.getElementById("lienAccueil").onclick = () => S ? ecranModule() : ecranBienvenue();
+afficherPieces();
+S ? ecranModule() : ecranBienvenue();
+if("serviceWorker" in navigator) window.addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+</script>
+</body>
+</html>
